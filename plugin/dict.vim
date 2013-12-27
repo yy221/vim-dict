@@ -38,10 +38,13 @@ if !exists("g:dict_leave_pw")
     let g:dict_leave_pw = 0
 endif
 
-command! -nargs=? -range Dict :call s:dict(<q-args>)
+"chliu modified for add my dict.exe tools
+"2013/12/27 15:08:50
+command! -nargs=* -range Dict :call s:dict(<q-args>, 0 )
+command! -nargs=* -range Dict2 :call s:dict(<q-args>, 1 )
 command! -nargs=0 DictShowDb :call s:dict_show_db()
 
-fun! s:dict(word)
+fun! s:dict( word, dict_type )
     if (getpos('.') == getpos("'<")) && empty(a:word)
         let word = getline("'<")[getpos("'<")[2] - 1:getpos("'>")[2] - 1]
     else
@@ -59,11 +62,18 @@ fun! s:dict(word)
     setlocal buftype=nofile ff=dos
     setlocal nobuflisted
 
-    for host in g:dict_hosts
-        for db in host[1]
-            silent! exe "noautocmd r!" g:dict_curl_command "-s" g:dict_curl_options "dict://" . host[0] . "/d:" . quoted_word . ":" . db
+    "chliu modified for add my dict.exe tools
+    "2013/12/27 15:08:50
+    if ( 0 == a:dict_type )
+        " silent! | redraw | echo "d:/home/dict.exe" quoted_word
+        silent! exe "noautocmd r!" "d:/home/dict.exe"  quoted_word 
+    else 
+        for host in g:dict_hosts
+            for db in host[1]
+                silent! exe "noautocmd r!" g:dict_curl_command "-s" g:dict_curl_options "dict://" . host[0] . "/d:" . quoted_word . ":" . db
+            endfor
         endfor
-    endfor
+    endif
 
     silent! exe "%s/^151 //g"
     silent! exe "%s/^153 //g"
